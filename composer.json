@@ -1,0 +1,17 @@
+{
+    "name": "francerz/api-client",
+    "description": "PHP Generic API Client",
+    "type": "library",
+    "require": {
+        "psr/http-client": "^1.0",
+        "francerz/http-utils": "^0.2.14",
+        "francerz/oauth2-client": "^0.2.5",
+        "francerz/php-power-data": "^0.1.3"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Francerz\\ApiClient\\": "src"
+        }
+    }
+}
