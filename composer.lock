@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "francerz/http-utils",
-            "version": "v0.2.14",
+            "version": "v0.2.15",
             "source": {
                 "type": "git",
                 "url": "https://github.com/francerz/php-http-utils.git",
-                "reference": "842af0a2470b09ed4919873ba8fc8cd7d539fc36"
+                "reference": "98e80db7439563ee14de1abdeff7c60f5fa39495"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/francerz/php-http-utils/zipball/842af0a2470b09ed4919873ba8fc8cd7d539fc36",
-                "reference": "842af0a2470b09ed4919873ba8fc8cd7d539fc36",
+                "url": "https://api.github.com/repos/francerz/php-http-utils/zipball/98e80db7439563ee14de1abdeff7c60f5fa39495",
+                "reference": "98e80db7439563ee14de1abdeff7c60f5fa39495",
                 "shasum": ""
             },
             "require": {
@@ -54,7 +54,7 @@
                 "psr-17",
                 "psr-7"
             ],
-            "time": "2020-11-30T16:49:35+00:00"
+            "time": "2021-01-31T02:06:42+00:00"
         },
         {
             "name": "francerz/oauth2-client",

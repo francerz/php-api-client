@@ -2,12 +2,18 @@
 
 namespace Francerz\ApiClient;
 
+use Francerz\Http\Utils\Constants\StatusCodes;
 use Francerz\Http\Utils\HttpFactoryManager;
+use Francerz\Http\Utils\MessageHelper;
+use Francerz\Http\Utils\ServerInterface;
+use Francerz\Http\Utils\UriHelper;
 use Francerz\OAuth2\AccessToken;
 use Francerz\OAuth2\Client\AuthClient;
+use Francerz\PowerData\Exceptions\InvalidOffsetException;
 use Francerz\PowerData\Functions;
 use InvalidArgumentException;
 use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 
 abstract class AbstractClient
@@ -27,6 +33,9 @@ abstract class AbstractClient
     private $handlerClientAccessTokenLoad;
     private $handlerClientAccessTokenChanged;
     private $handlerClientAccessTokenRevoke;
+
+    # Used to automatic redir after login
+    private $tempRedir;
 
     public function __construct(HttpFactoryManager $httpFactory, ClientInterface $httpClient)
     {
@@ -119,6 +128,17 @@ abstract class AbstractClient
         return $this->apiEndpoint;
     }
 
+    public function setCallbackEndpoint($uri)
+    {
+        if (is_string($uri)) {
+            $uri = $this->httpFactory->getUriFactory()->createUri($uri);
+        }
+        if (!$uri instanceof UriInterface) {
+            throw new InvalidOffsetException(__METHOD__.' $uri argument MUST be string or UriInterface');
+        }
+        $this->oauth2->setCallbackEndpoint($uri);
+    }
+
     protected function getOAuth2Client()
     {
         return $this->oauth2;
@@ -134,6 +154,7 @@ abstract class AbstractClient
         $this->oauth2->setClientSecret($client_secret);
     }
 
+    #region OAuth2 AccessToken (resource owner)
     public function setAccessToken(AccessToken $accessToken)
     {
         $this->oauth2->setAccessToken($accessToken);
@@ -144,16 +165,6 @@ abstract class AbstractClient
         return $this->oauth2->getAccessToken();
     }
 
-    public function setClientAccessToken(AccessToken $accessToken)
-    {
-        $this->oauth2->setClientAccessToken($accessToken);
-    }
-
-    public function getClientAccessToken()
-    {
-        return $this->oauth2->getClientAccessToken();
-    }
-
     public function setAccessTokenSessionKey(string $key)
     {
         $this->accessTokenSessionKey = $key;
@@ -162,16 +173,6 @@ abstract class AbstractClient
     public function getAccessTokenSessionKey() : string
     {
         return $this->accessTokenSessionKey;
-    }
-
-    public function setClientAccessTokenSessionKey(string $key)
-    {
-        $this->clientAccessTokenSessionKey = $key;
-    }
-
-    public function getClientAccessTokenSessionKey() : string
-    {
-        return $this->clientAccessTokenSessionKey;
     }
 
     public function setAccessTokenLoadHandler(callable $handler)
@@ -192,6 +193,38 @@ abstract class AbstractClient
         $this->handlerAccessTokenRevoke = $handler;
     }
 
+    public function loadAccessToken()
+    {
+        call_user_func($this->handlerAccessTokenLoad);
+    }
+
+    public function revokeAcccessToken()
+    {
+        call_user_func($this->handlerAccessTokenRevoke);
+    }
+    #endregion
+
+    #region OAuth2 Client Access Token (client credentials)
+    public function setClientAccessToken(AccessToken $accessToken)
+    {
+        $this->oauth2->setClientAccessToken($accessToken);
+    }
+
+    public function getClientAccessToken()
+    {
+        return $this->oauth2->getClientAccessToken();
+    }
+
+    public function setClientAccessTokenSessionKey(string $key)
+    {
+        $this->clientAccessTokenSessionKey = $key;
+    }
+
+    public function getClientAccessTokenSessionKey() : string
+    {
+        return $this->clientAccessTokenSessionKey;
+    }
+
     public function setClientAccessTokenLoadHandler(callable $handler)
     {
         $this->handlerClientAccessTokenLoad = $handler;
@@ -210,23 +243,89 @@ abstract class AbstractClient
         $this->handlerClientAccessTokenRevoke = $handler;
     }
 
-    public function loadAccessToken()
-    {
-        call_user_func($this->handlerAccessTokenLoad);
-    }
-
     public function loadClientAccessToken()
     {
         call_user_func($this->handlerClientAccessTokenLoad);
     }
 
-    public function revokeAcccessToken()
-    {
-        call_user_func($this->handlerAccessTokenRevoke);
-    }
-
     public function revokeClientAccessToken()
     {
         call_user_func($this->handlerClientAccessTokenRevoke);
+    }
+    #endregion
+
+    protected function makeAuthorizeRedirUri($appAuthUri)
+    {
+        $uriFactory = $this->httpFactory->getUriFactory();
+        
+        if (is_string($appAuthUri)) {
+            $appAuthUri = $uriFactory->createUri($appAuthUri);
+        }
+        
+        if (!$appAuthUri instanceof UriInterface) {
+            throw new InvalidArgumentException(__METHOD__.' $appAuthUri parameter MUST be string or UriInterface');
+        }
+        
+        $currentUri = UriHelper::getCurrent($uriFactory);
+        $appAuthUri = UriHelper::withQueryParam($appAuthUri, 'redir', (string)$currentUri);
+        
+        return $appAuthUri;
+    }
+    
+    protected function makeAuthorizeRedirResponse($appAuthUri)
+    {
+        $responseFactory = $this->httpFactory->getResponseFactory();
+        $appAuthUri = $this->makeAuthorizeRedirUri($appAuthUri);
+        $response = $responseFactory
+            ->createResponse(StatusCodes::REDIRECT_TEMPORARY_REDIRECT)
+            ->withHeader('Location', (string)$appAuthUri);
+        return $response;
+    }
+
+    protected function makeRequestAuthorizationCodeUri(array $scopes = [], string $state = '', ?string $redir = null) : UriInterface
+    {
+        $uri = $this->oauth2->getAuthorizationCodeRequestUri($scopes, $state);
+
+        $uriFactory = $this->httpFactory->getUriFactory();
+
+        if (!empty($redir)) {
+            $redirectUri = $uriFactory->createUri(UriHelper::getQueryParam($uri, 'redirect_uri'));
+            $redirectUri = UriHelper::withQueryParam($redirectUri, 'redir', $redir);
+            $uri = UriHelper::withQueryParam($uri, 'redirect_uri', (string)$redirectUri);
+        }
+
+        return $uri;
+    }
+
+    protected function makeRequestAuthorizationCodeRedirect(array $scopes = [], string $state = '', ?string $redir = null)
+    {
+        if (is_null($redir)) {
+            $uriFactory = $this->getHttpFactoryManager()->getUriFactory();
+            $currentUri = UriHelper::getCurrent($uriFactory);
+            $redir = UriHelper::getQueryParam($currentUri, 'redir');
+        }
+
+        $authUri = $this->makeRequestAuthorizationCodeUri($scopes, $state, $redir);
+        MessageHelper::setHttpFactoryManager($this->httpFactory);
+        return MessageHelper::makeRedirect($authUri);
+    }
+
+    protected function handleAuthorizeResponse(?ServerRequestInterface $request = null)
+    {
+        if (is_null($request)) {
+            MessageHelper::setHttpFactoryManager($this->httpFactory);
+            $request = MessageHelper::getCurrentRequest();
+        }
+        $requestUri = $request->getUri();
+        $this->tempRedir = UriHelper::getQueryParam($requestUri, 'redir');
+        return $this->oauth2->handleCallbackRequest($request);
+    }
+
+    public function getRedir($defaultUri)
+    {
+        if (isset($this->tempRedir)) {
+            return $this->tempRedir;
+        }
+        return $defaultUri;
     }
 }
