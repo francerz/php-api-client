@@ -34,9 +34,6 @@ abstract class AbstractClient
     private $handlerClientAccessTokenChanged;
     private $handlerClientAccessTokenRevoke;
 
-    # Used to automatic redir after login
-    private $tempRedir;
-
     public function __construct(HttpFactoryManager $httpFactory, ClientInterface $httpClient)
     {
         $this->httpFactory = $httpFactory;
@@ -316,15 +313,16 @@ abstract class AbstractClient
             MessageHelper::setHttpFactoryManager($this->httpFactory);
             $request = MessageHelper::getCurrentRequest();
         }
-        $requestUri = $request->getUri();
-        $this->tempRedir = UriHelper::getQueryParam($requestUri, 'redir');
         return $this->oauth2->handleCallbackRequest($request);
     }
 
-    public function getRedir($defaultUri)
+    public function getRedir(string $defaultUri)
     {
-        if (isset($this->tempRedir)) {
-            return $this->tempRedir;
+        $uriFactory = $this->httpFactory->getUriFactory();
+        $currentUri = UriHelper::getCurrent($uriFactory);
+        $redirUri = UriHelper::getQueryParam($currentUri, 'redir');
+        if (isset($redirUri)) {
+            return $redirUri;
         }
         return $defaultUri;
     }
