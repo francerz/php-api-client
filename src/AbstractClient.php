@@ -266,26 +266,12 @@ abstract class AbstractClient
         
         return $appAuthUri;
     }
-    
-    protected function makeAuthorizeRedirResponse($appAuthUri, string $redirKey = 'redir')
-    {
-        MessageHelper::setHttpFactoryManager($this->httpFactory);
-        $appAuthUri = $this->makeAuthorizeRedirUri($appAuthUri, $redirKey);
-        return MessageHelper::makeRedirect($appAuthUri);
-    }
 
     protected function makeRequestAuthorizationCodeUri($callbackUri, array $scopes = [], string $state = '') : UriInterface
     {
         $this->oauth2->setCallbackEndpoint($callbackUri);
         $uri = $this->oauth2->getAuthorizationCodeRequestUri($scopes, $state);
         return $uri;
-    }
-
-    protected function makeRequestAuthorizationCodeRedirect($callbackUri, array $scopes = [], string $state = '')
-    {
-        $authUri = $this->makeRequestAuthorizationCodeUri($callbackUri, $scopes, $state);
-        MessageHelper::setHttpFactoryManager($this->httpFactory);
-        return MessageHelper::makeRedirect($authUri);
     }
 
     protected function handleAuthorizeResponse(?ServerRequestInterface $request = null)
