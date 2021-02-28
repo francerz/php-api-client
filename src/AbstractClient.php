@@ -2,10 +2,8 @@
 
 namespace Francerz\ApiClient;
 
-use Francerz\Http\Utils\Constants\StatusCodes;
 use Francerz\Http\Utils\HttpFactoryManager;
 use Francerz\Http\Utils\MessageHelper;
-use Francerz\Http\Utils\ServerInterface;
 use Francerz\Http\Utils\UriHelper;
 use Francerz\OAuth2\AccessToken;
 use Francerz\OAuth2\Client\AuthClient;
@@ -271,12 +269,9 @@ abstract class AbstractClient
     
     protected function makeAuthorizeRedirResponse($appAuthUri)
     {
-        $responseFactory = $this->httpFactory->getResponseFactory();
+        MessageHelper::setHttpFactoryManager($this->httpFactory);
         $appAuthUri = $this->makeAuthorizeRedirUri($appAuthUri);
-        $response = $responseFactory
-            ->createResponse(StatusCodes::REDIRECT_TEMPORARY_REDIRECT)
-            ->withHeader('Location', (string)$appAuthUri);
-        return $response;
+        return MessageHelper::makeRedirect($appAuthUri);
     }
 
     protected function makeRequestAuthorizationCodeUri(array $scopes = [], string $state = '', ?string $redir = null) : UriInterface
