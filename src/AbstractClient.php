@@ -249,7 +249,7 @@ abstract class AbstractClient
     }
     #endregion
 
-    protected function makeAuthorizeRedirUri($appAuthUri)
+    protected function makeAuthorizeRedirUri($appAuthUri, string $redirKey = 'redir')
     {
         $uriFactory = $this->httpFactory->getUriFactory();
         
@@ -262,42 +262,28 @@ abstract class AbstractClient
         }
         
         $currentUri = UriHelper::getCurrent($uriFactory);
-        $appAuthUri = UriHelper::withQueryParam($appAuthUri, 'redir', (string)$currentUri);
+        $appAuthUri = UriHelper::withQueryParam($appAuthUri, $redirKey, (string)$currentUri);
         
         return $appAuthUri;
     }
     
-    protected function makeAuthorizeRedirResponse($appAuthUri)
+    protected function makeAuthorizeRedirResponse($appAuthUri, string $redirKey = 'redir')
     {
         MessageHelper::setHttpFactoryManager($this->httpFactory);
-        $appAuthUri = $this->makeAuthorizeRedirUri($appAuthUri);
+        $appAuthUri = $this->makeAuthorizeRedirUri($appAuthUri, $redirKey);
         return MessageHelper::makeRedirect($appAuthUri);
     }
 
-    protected function makeRequestAuthorizationCodeUri(array $scopes = [], string $state = '', ?string $redir = null) : UriInterface
+    protected function makeRequestAuthorizationCodeUri($callbackUri, array $scopes = [], string $state = '') : UriInterface
     {
+        $this->oauth2->setCallbackEndpoint($callbackUri);
         $uri = $this->oauth2->getAuthorizationCodeRequestUri($scopes, $state);
-
-        $uriFactory = $this->httpFactory->getUriFactory();
-
-        if (!empty($redir)) {
-            $redirectUri = $uriFactory->createUri(UriHelper::getQueryParam($uri, 'redirect_uri'));
-            $redirectUri = UriHelper::withQueryParam($redirectUri, 'redir', $redir);
-            $uri = UriHelper::withQueryParam($uri, 'redirect_uri', (string)$redirectUri);
-        }
-
         return $uri;
     }
 
-    protected function makeRequestAuthorizationCodeRedirect(array $scopes = [], string $state = '', ?string $redir = null)
+    protected function makeRequestAuthorizationCodeRedirect($callbackUri, array $scopes = [], string $state = '')
     {
-        if (is_null($redir)) {
-            $uriFactory = $this->getHttpFactoryManager()->getUriFactory();
-            $currentUri = UriHelper::getCurrent($uriFactory);
-            $redir = UriHelper::getQueryParam($currentUri, 'redir');
-        }
-
-        $authUri = $this->makeRequestAuthorizationCodeUri($scopes, $state, $redir);
+        $authUri = $this->makeRequestAuthorizationCodeUri($callbackUri, $scopes, $state);
         MessageHelper::setHttpFactoryManager($this->httpFactory);
         return MessageHelper::makeRedirect($authUri);
     }
