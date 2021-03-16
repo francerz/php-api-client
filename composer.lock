@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "francerz/http-utils",
-            "version": "v0.2.15",
+            "version": "v0.2.19",
             "source": {
                 "type": "git",
                 "url": "https://github.com/francerz/php-http-utils.git",
-                "reference": "98e80db7439563ee14de1abdeff7c60f5fa39495"
+                "reference": "9421159b89c80f2eefb46a1b5b05f17f8101f755"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/francerz/php-http-utils/zipball/98e80db7439563ee14de1abdeff7c60f5fa39495",
-                "reference": "98e80db7439563ee14de1abdeff7c60f5fa39495",
+                "url": "https://api.github.com/repos/francerz/php-http-utils/zipball/9421159b89c80f2eefb46a1b5b05f17f8101f755",
+                "reference": "9421159b89c80f2eefb46a1b5b05f17f8101f755",
                 "shasum": ""
             },
             "require": {
@@ -54,20 +54,24 @@
                 "psr-17",
                 "psr-7"
             ],
-            "time": "2021-01-31T02:06:42+00:00"
+            "support": {
+                "issues": "https://github.com/francerz/php-http-utils/issues",
+                "source": "https://github.com/francerz/php-http-utils/tree/v0.2.19"
+            },
+            "time": "2021-03-16T19:43:36+00:00"
         },
         {
             "name": "francerz/oauth2-client",
-            "version": "v0.2.5",
+            "version": "v0.2.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/francerz/php-oauth2-client.git",
-                "reference": "a75e49083539d3ccc5effbb98c5a30b4861edafc"
+                "reference": "e3e865aca701bcd4bbc45587655772cd2c7dd08c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/francerz/php-oauth2-client/zipball/a75e49083539d3ccc5effbb98c5a30b4861edafc",
-                "reference": "a75e49083539d3ccc5effbb98c5a30b4861edafc",
+                "url": "https://api.github.com/repos/francerz/php-oauth2-client/zipball/e3e865aca701bcd4bbc45587655772cd2c7dd08c",
+                "reference": "e3e865aca701bcd4bbc45587655772cd2c7dd08c",
                 "shasum": ""
             },
             "require": {
@@ -95,20 +99,24 @@
                 "oauth2",
                 "psr-7"
             ],
-            "time": "2021-01-01T06:03:05+00:00"
+            "support": {
+                "issues": "https://github.com/francerz/php-oauth2-client/issues",
+                "source": "https://github.com/francerz/php-oauth2-client/tree/v0.2.6"
+            },
+            "time": "2021-02-01T23:00:42+00:00"
         },
         {
             "name": "francerz/oauth2-core",
-            "version": "v0.2.9",
+            "version": "v0.2.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/francerz/php-oauth2-core.git",
-                "reference": "816632bee3fbca066c17c98402a23e2cd608d391"
+                "reference": "76a8560dd46002f0062c0664ffcc0ecd07c6e721"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/francerz/php-oauth2-core/zipball/816632bee3fbca066c17c98402a23e2cd608d391",
-                "reference": "816632bee3fbca066c17c98402a23e2cd608d391",
+                "url": "https://api.github.com/repos/francerz/php-oauth2-core/zipball/76a8560dd46002f0062c0664ffcc0ecd07c6e721",
+                "reference": "76a8560dd46002f0062c0664ffcc0ecd07c6e721",
                 "shasum": ""
             },
             "require": {
@@ -134,20 +142,24 @@
                 "oauth2",
                 "psr-7"
             ],
-            "time": "2021-01-02T20:38:02+00:00"
+            "support": {
+                "issues": "https://github.com/francerz/php-oauth2-core/issues",
+                "source": "https://github.com/francerz/php-oauth2-core/tree/v0.2.10"
+            },
+            "time": "2021-02-01T23:37:37+00:00"
         },
         {
             "name": "francerz/php-power-data",
-            "version": "v0.1.3",
+            "version": "v0.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/francerz/php-power-data.git",
-                "reference": "783d29ac3aa6d10d9ab96d662418a32dbf6bbc52"
+                "reference": "6d0c65e2508c18506643bac30e465d045aaa12c9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/francerz/php-power-data/zipball/783d29ac3aa6d10d9ab96d662418a32dbf6bbc52",
-                "reference": "783d29ac3aa6d10d9ab96d662418a32dbf6bbc52",
+                "url": "https://api.github.com/repos/francerz/php-power-data/zipball/6d0c65e2508c18506643bac30e465d045aaa12c9",
+                "reference": "6d0c65e2508c18506643bac30e465d045aaa12c9",
                 "shasum": ""
             },
             "require-dev": {
@@ -166,7 +178,11 @@
                 }
             ],
             "description": "PHP data structures for complex data handling",
-            "time": "2021-01-29T19:30:57+00:00"
+            "support": {
+                "issues": "https://github.com/francerz/php-power-data/issues",
+                "source": "https://github.com/francerz/php-power-data/tree/v0.1.5"
+            },
+            "time": "2021-02-06T20:21:11+00:00"
         },
         {
             "name": "psr/http-client",
@@ -215,6 +231,9 @@
                 "psr",
                 "psr-18"
             ],
+            "support": {
+                "source": "https://github.com/php-fig/http-client/tree/master"
+            },
             "time": "2020-06-29T06:28:15+00:00"
         },
         {
@@ -267,6 +286,9 @@
                 "request",
                 "response"
             ],
+            "support": {
+                "source": "https://github.com/php-fig/http-factory/tree/master"
+            },
             "time": "2019-04-30T12:38:16+00:00"
         },
         {
@@ -317,6 +339,9 @@
                 "request",
                 "response"
             ],
+            "support": {
+                "source": "https://github.com/php-fig/http-message/tree/master"
+            },
             "time": "2016-08-06T14:39:51+00:00"
         }
     ],
@@ -328,5 +353,8 @@
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "1.1.0"
+    "platform-overrides": {
+        "php": "7.2.24"
+    },
+    "plugin-api-version": "2.0.0"
 }

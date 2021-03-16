@@ -288,7 +288,7 @@ abstract class AbstractClient
         $uriFactory = $this->httpFactory->getUriFactory();
         $currentUri = UriHelper::getCurrent($uriFactory);
         $redirUri = UriHelper::getQueryParam($currentUri, 'redir');
-        if (isset($redirUri)) {
+        if (UriHelper::isValid($redirUri)) {
             return $redirUri;
         }
         return $defaultUri;
