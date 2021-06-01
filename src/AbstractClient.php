@@ -3,6 +3,7 @@
 namespace Francerz\ApiClient;
 
 use Francerz\Http\Utils\HttpFactoryManager;
+use Francerz\Http\Utils\HttpHelper;
 use Francerz\Http\Utils\MessageHelper;
 use Francerz\Http\Utils\UriHelper;
 use Francerz\OAuth2\AccessToken;
@@ -19,6 +20,7 @@ abstract class AbstractClient
     private $oauth2;
     private $httpFactory;
     private $httpClient;
+    private $httpHelper;
 
     private $apiEndpoint;
 
@@ -35,6 +37,7 @@ abstract class AbstractClient
     public function __construct(HttpFactoryManager $httpFactory, ClientInterface $httpClient)
     {
         $this->httpFactory = $httpFactory;
+        $this->httpHelper = new HttpHelper($httpFactory);
         $this->httpClient = $httpClient;
 
         $this->oauth2 = new AuthClient($httpFactory, $httpClient);
@@ -277,8 +280,7 @@ abstract class AbstractClient
     protected function handleAuthorizeResponse(?ServerRequestInterface $request = null)
     {
         if (is_null($request)) {
-            MessageHelper::setHttpFactoryManager($this->httpFactory);
-            $request = MessageHelper::getCurrentRequest();
+            $request = $this->httpHelper->getCurrentRequest();
         }
         return $this->oauth2->handleCallbackRequest($request);
     }
