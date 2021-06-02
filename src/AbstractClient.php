@@ -4,7 +4,6 @@ namespace Francerz\ApiClient;
 
 use Francerz\Http\Utils\HttpFactoryManager;
 use Francerz\Http\Utils\HttpHelper;
-use Francerz\Http\Utils\MessageHelper;
 use Francerz\Http\Utils\UriHelper;
 use Francerz\OAuth2\AccessToken;
 use Francerz\OAuth2\Client\AuthClient;
@@ -24,10 +23,10 @@ abstract class AbstractClient
 
     private $apiEndpoint;
 
-    private $accessTokenSessionKey = 'access-token';
-    private $handlerAccessTokenLoad;
-    private $handlerAccessTokenChanged;
-    private $handlerAccessTokenRevoke;
+    private $ownerAccessTokenSessionKey = 'access-token';
+    private $handlerOwnerAccessTokenLoad;
+    private $handlerOwnerAccessTokenChanged;
+    private $handlerOwnerAccessTokenRevoke;
 
     private $clientAccessTokenSessionKey = 'access-token-client';
     private $handlerClientAccessTokenLoad;
@@ -46,8 +45,8 @@ abstract class AbstractClient
         $this->loadDefaultClientAccessTokenHandlers();
 
         $self = $this;
-        $this->oauth2->setAccessTokenChangedHandler(function(AccessToken $accessToken) use ($self) {
-            call_user_func($self->handlerAccessTokenChanged, $accessToken);
+        $this->oauth2->setOwnerAccessTokenChangedHandler(function(AccessToken $accessToken) use ($self) {
+            call_user_func($self->handlerOwnerAccessTokenChanged, $accessToken);
         });
         $this->oauth2->setClientAccessTokenChangedHandler(function(AccessToken $accessToken) use ($self) {
             call_user_func($self->handlerClientAccessTokenChanged, $accessToken);
@@ -56,18 +55,18 @@ abstract class AbstractClient
 
     protected function loadDefaultAccessTokenHandlers()
     {
-        $atsk = $this->accessTokenSessionKey;
-        $this->setAccessTokenLoadHandler(function() use ($atsk) {
-            if (isset($_SESSION[$atsk]) && $_SESSION[$atsk] instanceof AccessToken) {
-                $this->setAccessToken($_SESSION[$atsk]);
+        $oatsk = $this->ownerAccessTokenSessionKey;
+        $this->setOwnerAccessTokenLoadHandler(function() use ($oatsk) {
+            if (isset($_SESSION[$oatsk]) && $_SESSION[$oatsk] instanceof AccessToken) {
+                $this->setOwnerAccessToken($_SESSION[$oatsk]);
             }
         });
-        $this->setAccessTokenChangedHandler(function(AccessToken $accessToken) use ($atsk) {
-            $_SESSION[$atsk] = $accessToken;
+        $this->setOwnerAccessTokenChangedHandler(function(AccessToken $accessToken) use ($oatsk) {
+            $_SESSION[$oatsk] = $accessToken;
         });
-        $this->setAccessTokenRevokeHandler(function() use ($atsk) {
-            if (isset($_SESSION[$atsk]) && $_SESSION[$atsk] instanceof AccessToken) {
-                unset($_SESSION[$atsk]);
+        $this->setOwnerAccessTokenRevokeHandler(function() use ($oatsk) {
+            if (isset($_SESSION[$oatsk]) && $_SESSION[$oatsk] instanceof AccessToken) {
+                unset($_SESSION[$oatsk]);
             }
         });
     }
@@ -152,57 +151,149 @@ abstract class AbstractClient
         $this->oauth2->setClientSecret($client_secret);
     }
 
-    #region OAuth2 AccessToken (resource owner)
+    #region OAuth2 Owner AccessToken
+    /**
+     * @deprecated v0.2.4
+     *
+     * @param AccessToken $accessToken
+     * @return void
+     */
     public function setAccessToken(AccessToken $accessToken)
     {
-        $this->oauth2->setAccessToken($accessToken);
+        $this->setOwnerAccessToken($accessToken);
     }
 
+    /**
+     * @deprecated v0.2.4
+     *
+     * @return void
+     */
     public function getAccessToken()
     {
-        return $this->oauth2->getAccessToken();
+        return $this->getOwnerAccessToken();
     }
 
+    public function setOwnerAccessToken(AccessToken $accessToken)
+    {
+        $this->oauth2->setOwnerAccessToken($accessToken);
+    }
+
+    public function getOwnerAccessToken()
+    {
+        return $this->oauth2->getOwnerAccessToken();
+    }
+
+    /**
+     * @deprecated v0.2.4 Use setOwnerAccessTokenSessionKey instead
+     *
+     * @param string $key
+     * @return void
+     */
     public function setAccessTokenSessionKey(string $key)
     {
-        $this->accessTokenSessionKey = $key;
+        $this->setOwnerAccessTokenSessionKey($key);
+    }
+    public function setOwnerAccessTokenSessionKey(string $key)
+    {
+        $this->ownerAccessTokenSessionKey = $key;
     }
 
+    /**
+     * @deprecated v0.2.4
+     *
+     * @return string
+     */
     public function getAccessTokenSessionKey() : string
     {
-        return $this->accessTokenSessionKey;
+        return $this->getOwnerAccessTokenSessionKey();
+    }
+    public function getOwnerAccessTokenSessionKey() : string
+    {
+        return $this->ownerAccessTokenSessionKey;
     }
 
+    /**
+     * @deprecated v0.2.4 Use setOwnerAccessTokenLoadHandler instead
+     *
+     * @param callable $handler
+     * @return void
+     */
     public function setAccessTokenLoadHandler(callable $handler)
     {
-        $this->handlerAccessTokenLoad = $handler;
+        $this->setOwnerAccessTokenLoadHandler($handler);
     }
 
+    public function setOwnerAccessTokenLoadHandler(callable $handler)
+    {
+        $this->handlerOwnerAccessTokenLoad = $handler;
+    }
+
+    /**
+     * @deprecated v0.2.4 Use setOwnerAccessTokenChangedHandler instead
+     *
+     * @param callable $handler
+     * @return void
+     */
     public function setAccessTokenChangedHandler(callable $handler)
     {
-        if (!Functions::testSignature($handler, [AccessToken::class])) {
-            throw new InvalidArgumentException(__METHOD__.' callable signature must be: func(AccessToken):void');
-        }
-        $this->handlerAccessTokenChanged = $handler;
+        $this->setOwnerAccessTokenChangedHandler($handler);
     }
 
+    public function setOwnerAccessTokenChangedHandler(callable $handler)
+    {
+        if (!Functions::testSignature($handler, [AccessToken::class])) {
+            throw new InvalidArgumentException(__METHOD__.' callable signature must be: fn(AccessToken):void');
+        }
+        $this->handlerOwnerAccessTokenChanged = $handler;
+    }
+
+    /**
+     * @deprecated v0.2.4 Use setOwnerAccessTokenRevokeHandler instead
+     *
+     * @param callable $handler
+     * @return void
+     */
     public function setAccessTokenRevokeHandler(callable $handler)
     {
-        $this->handlerAccessTokenRevoke = $handler;
+        $this->setOwnerAccessTokenRevokeHandler($handler);
     }
 
+    public function setOwnerAccessTokenRevokeHandler(callable $handler)
+    {
+        $this->handlerOwnerAccessTokenRevoke = $handler;
+    }
+
+
+    /**
+     * @deprecated v0.2.4 Use loadOwnerAccessToken instead
+     *
+     * @return void
+     */
     public function loadAccessToken()
     {
-        call_user_func($this->handlerAccessTokenLoad);
+        $this->loadOwnerAccessToken();
+    }
+    public function loadOwnerAccessToken()
+    {
+        call_user_func($this->handlerOwnerAccessTokenLoad);
     }
 
+    /**
+     * @deprecated v0.2.4 Use revokeOwnerAccessToken instead
+     *
+     * @return void
+     */
     public function revokeAcccessToken()
     {
-        call_user_func($this->handlerAccessTokenRevoke);
+        $this->revokeOwnerAcccessToken();
+    }
+    public function revokeOwnerAcccessToken()
+    {
+        call_user_func($this->handlerOwnerAccessTokenRevoke);
     }
     #endregion
 
-    #region OAuth2 Client Access Token (client credentials)
+    #region OAuth2 Client AccessToken
     public function setClientAccessToken(AccessToken $accessToken)
     {
         $this->oauth2->setClientAccessToken($accessToken);

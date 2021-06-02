@@ -158,26 +158,26 @@
         },
         {
             "name": "francerz/oauth2-client",
-            "version": "v0.2.7",
+            "version": "v0.2.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/francerz/php-oauth2-client.git",
-                "reference": "01ca344537cfdeecfa299255bc30a79d4081afda"
+                "reference": "f4cbbec9d6e8b905ffee701f5443d4a1e02e6779"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/francerz/php-oauth2-client/zipball/01ca344537cfdeecfa299255bc30a79d4081afda",
-                "reference": "01ca344537cfdeecfa299255bc30a79d4081afda",
+                "url": "https://api.github.com/repos/francerz/php-oauth2-client/zipball/f4cbbec9d6e8b905ffee701f5443d4a1e02e6779",
+                "reference": "f4cbbec9d6e8b905ffee701f5443d4a1e02e6779",
                 "shasum": ""
             },
             "require": {
-                "francerz/oauth2-core": "^0.2.0",
+                "francerz/oauth2-core": "^0.2",
                 "francerz/php-power-data": "^0.1.0",
                 "psr/http-client": "^1.0",
                 "psr/http-message": "^1.0"
             },
             "require-dev": {
-                "francerz/http": "^0.2.2",
+                "francerz/http": "^0.3",
                 "phpunit/phpunit": "^8.5"
             },
             "type": "library",
@@ -197,9 +197,9 @@
             ],
             "support": {
                 "issues": "https://github.com/francerz/php-oauth2-client/issues",
-                "source": "https://github.com/francerz/php-oauth2-client/tree/v0.2.7"
+                "source": "https://github.com/francerz/php-oauth2-client/tree/v0.2.9"
             },
-            "time": "2021-06-01T18:18:10+00:00"
+            "time": "2021-06-02T01:26:20+00:00"
         },
         {
             "name": "francerz/oauth2-core",
