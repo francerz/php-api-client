@@ -35,6 +35,8 @@ abstract class AbstractClient
 
     public function __construct(HttpFactoryManager $httpFactory, ClientInterface $httpClient)
     {
+        if (!isset($_SESSION)) session_start();
+
         $this->httpFactory = $httpFactory;
         $this->httpHelper = new HttpHelper($httpFactory);
         $this->httpClient = $httpClient;
