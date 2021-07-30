@@ -13,6 +13,7 @@ use InvalidArgumentException;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
+use RuntimeException;
 
 abstract class AbstractClient
 {
@@ -35,7 +36,7 @@ abstract class AbstractClient
 
     public function __construct(HttpFactoryManager $httpFactory, ClientInterface $httpClient)
     {
-        if (!isset($_SESSION)) session_start();
+        $this->initSession();
 
         $this->httpFactory = $httpFactory;
         $this->httpHelper = new HttpHelper($httpFactory);
@@ -53,6 +54,17 @@ abstract class AbstractClient
         $this->oauth2->setClientAccessTokenChangedHandler(function(AccessToken $accessToken) use ($self) {
             call_user_func($self->handlerClientAccessTokenChanged, $accessToken);
         });
+    }
+
+    private function initSession()
+    {
+        switch (session_status()) {
+            case PHP_SESSION_DISABLED:
+                throw new RuntimeException('Cannot start because Sessions are disabled.');
+            case PHP_SESSION_NONE:
+                session_start();
+                break;
+        }
     }
 
     protected function loadDefaultAccessTokenHandlers()
